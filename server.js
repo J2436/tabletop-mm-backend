@@ -17,7 +17,7 @@ mongoose
     console.error("error connecting to server " + error.message)
   );
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use("/login", loginRouter);
 app.use("/players", playersRouter);

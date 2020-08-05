@@ -10,24 +10,21 @@ loginRouter.post("/", async (req, res) => {
   const passwordCorrect =
     user === null ? false : await bcrypt.compare(body.password, user.password);
 
-  console.log(user);
-
   if (!(user && passwordCorrect)) {
-    return response.status(401).json({
-      error: "invalid email or password",
-    });
+    return res.status(401).json({ error: "invalid email or password" });
+  } else {
+    const userFormToken = {
+      email: user.email,
+      id: user._id,
+    };
+
+    const token = jwt.sign(userFormToken, process.env.SECRET);
+
+    res
+      .status(201)
+      .cookie("jwt", token, { httpOnly: true })
+      .send({ token, email: user.email, screenName: user.screenName });
   }
-
-  const userFormToken = {
-    email: user.email,
-    id: user._id,
-  };
-
-  const token = jwt.sign(userFormToken, process.env.SECRET);
-
-  res
-    .status(200)
-    .send({ token, email: user.email, screenName: user.screenName });
 });
 
 module.exports = loginRouter;
