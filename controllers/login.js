@@ -5,7 +5,6 @@ const Player = require("../models/player");
 
 loginRouter.post("/", async (req, res) => {
   const body = req.body;
-
   const user = await Player.findOne({ email: body.email });
   const passwordCorrect =
     user === null ? false : await bcrypt.compare(body.password, user.password);
@@ -18,13 +17,17 @@ loginRouter.post("/", async (req, res) => {
       id: user._id,
     };
 
-    const token = jwt.sign(userFormToken, process.env.SECRET);
+    const token = jwt.sign(userFormToken, process.env.SECRET, {});
 
     res
       .status(201)
-      .cookie("jwt", token, { httpOnly: true })
+      .cookie("jwt", token, { httpOnly: false })
       .send({ token, email: user.email, screenName: user.screenName });
   }
+});
+
+loginRouter.get("/logout", (req, res) => {
+  res.clearCookie("jwt").send();
 });
 
 module.exports = loginRouter;
