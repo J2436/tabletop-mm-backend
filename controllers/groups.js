@@ -2,21 +2,7 @@ const groupsRouter = require("express").Router();
 const Group = require("../models/group");
 const jwt = require("jsonwebtoken");
 const Player = require("../models/player");
-
-const getTokenFrom = (req) => {
-  const cookies = req.get("cookie").split(";");
-  let token = "";
-
-  cookies.forEach((cookie) => {
-    if (cookie.indexOf("jwt") >= 0) {
-      token = cookie;
-    } else {
-      token = null;
-    }
-  });
-
-  return token.substr(4);
-};
+const { getTokenFrom } = require("../utils/token");
 
 groupsRouter.get("/", (req, res) => {
   Group.find({})

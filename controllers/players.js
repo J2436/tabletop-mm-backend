@@ -1,6 +1,7 @@
 const playersRouter = require("express").Router();
 const Player = require("../models/player");
 const bcrypt = require("bcrypt");
+const { getToken } = require("../utils/token");
 
 playersRouter.get("/", (req, res) => {
   Player.find({})
@@ -19,6 +20,21 @@ playersRouter.get("/:id", (req, res) => {
     .catch((err) => {
       res.send(err);
     });
+});
+
+playersRouter.get("/currentUserID", (req, res) => {
+  let decodedToken = jwt.getDecodedToken(req);
+  res.send(decodedToken);
+  console.log(typeof decodedToken);
+});
+
+playersRouter.get("/playersExcept/:id", (req, res) => {
+  Player.find({ _id: { $ne: req.params.id } })
+    .then((data) => {
+      console.log(data);
+      res.send(data);
+    })
+    .catch((err) => res.send(err));
 });
 
 playersRouter.post("/", async (req, res) => {
