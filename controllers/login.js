@@ -2,8 +2,7 @@ const loginRouter = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Player = require("../models/player");
-const { getTokenFrom } = require("../utils/token");
-
+const { getTokenFrom, getDecodedToken } = require("../utils/token");
 loginRouter.post("/", async (req, res) => {
   const body = req.body;
   const user = await Player.findOne({ email: body.email });
@@ -32,7 +31,6 @@ loginRouter.post("/", async (req, res) => {
 loginRouter.get("/isLoggedIn", (req, res) => {
   const token = getTokenFrom(req);
   const decodedToken = jwt.verify(token, process.env.SECRET);
-  const user = console.log(decodedToken);
   res.send(decodedToken);
 });
 
