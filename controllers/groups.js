@@ -14,6 +14,64 @@ groupsRouter.get("/", (req, res) => {
     });
 });
 
+groupsRouter.get("/groupsExceptUser", (req, res) => {
+  const token = getTokenFrom(req);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if (decodedToken) {
+    Group.find({ owner: decodedToken.id })
+      .then((data) => {
+        console.log(data);
+        res.send(data);
+      })
+      .catch((err) => res.send(err));
+  } else {
+    res.status(404).send();
+  }
+});
+
+groupsRouter.get("/ownedGroups", (req, res) => {
+  const token = getTokenFrom(req);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  if (decodedToken) {
+    Group.find({ owner: decodedToken.id })
+      .then((data) => {
+        console.log(data);
+        res.send(data);
+      })
+      .catch((err) => res.send(err));
+  } else {
+    res.status(404).send();
+  }
+});
+
+groupsRouter.get("/joinedGroups", (req, res) => {
+  const token = getTokenFrom(req);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  if (decodedToken) {
+    Group.find({
+      owner: { $ne: decodedToken.id },
+      players: { $in: [decodedToken.id] },
+    }).then((data) => res.send(data));
+  } else {
+    res.status(404).send();
+  }
+});
+
+groupsRouter.get("/unjoinedGroups", (req, res) => {
+  const token = getTokenFrom(req);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  if (decodedToken) {
+    Group.find({ players: { $ne: [decodedToken.id] } })
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => res.status(401).send(err));
+  } else {
+    res.status(404).send();
+  }
+});
+
 groupsRouter.post("/createGroup", async (req, res) => {
   const token = getTokenFrom(req);
   const decodedToken = jwt.verify(token, process.env.SECRET);
