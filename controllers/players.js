@@ -12,13 +12,19 @@ playersRouter.get("/", (req, res) => {
     .catch((err) => res.send(err));
 });
 
-playersRouter.get("/playersExcept/:id", (req, res) => {
-  Player.find({ _id: { $ne: req.params.id } })
-    .then((data) => {
-      console.log(data);
-      res.send(data);
-    })
-    .catch((err) => res.send([]));
+playersRouter.get("/playersExceptUser", (req, res) => {
+  const token = getTokenFrom(req);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if (decodedToken) {
+    Player.find({ _id: { $ne: decodedToken.id } })
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => res.send([]));
+  } else {
+    res.status(404).send();
+  }
 });
 
 playersRouter.get("/currentUserID", (req, res) => {

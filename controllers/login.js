@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Player = require("../models/player");
 const { getTokenFrom, getDecodedToken } = require("../utils/token");
+
 loginRouter.post("/", async (req, res) => {
   const body = req.body;
   const user = await Player.findOne({ email: body.email });
@@ -23,8 +24,8 @@ loginRouter.post("/", async (req, res) => {
 
     res
       .status(201)
-      .cookie("jwt", token, { httpOnly: false })
-      .send({ token, email: user.email, screenName: user.screenName });
+      .cookie("jwt", token, { httpOnly: true })
+      .send({ token, id: user.id, screenName: user.screenName });
   }
 });
 
