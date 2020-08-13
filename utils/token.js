@@ -1,10 +1,12 @@
 const jwt = require("jsonwebtoken");
 
 const getTokenFrom = (req) => {
-  console.log(req.get("cookie"));
+  if (req.get("cookie") === undefined) {
+    return null;
+  }
+
   const cookies = req.get("cookie").split(";");
   let token = "";
-
   cookies.forEach((cookie) => {
     if (cookie.indexOf("jwt") >= 0) {
       token = cookie;

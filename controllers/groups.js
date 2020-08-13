@@ -14,29 +14,12 @@ groupsRouter.get("/", (req, res) => {
     });
 });
 
-groupsRouter.get("/groupsExceptUser", (req, res) => {
-  const token = getTokenFrom(req);
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (decodedToken) {
-    Group.find({ owner: decodedToken.id })
-      .then((data) => {
-        console.log(data);
-        res.send(data);
-      })
-      .catch((err) => res.send(err));
-  } else {
-    res.status(404).send();
-  }
-});
-
 groupsRouter.get("/ownedGroups", (req, res) => {
   const token = getTokenFrom(req);
   const decodedToken = jwt.verify(token, process.env.SECRET);
   if (decodedToken) {
     Group.find({ owner: decodedToken.id })
       .then((data) => {
-        console.log(data);
         res.send(data);
       })
       .catch((err) => res.send(err));
@@ -52,6 +35,7 @@ groupsRouter.get("/joinedGroups", (req, res) => {
     Group.find({
       owner: { $ne: decodedToken.id },
       players: { $in: [decodedToken.id] },
+      meetingDateTime: { $gt: Math.floor(Date.now() / 1000) },
     }).then((data) => res.send(data));
   } else {
     res.status(404).send();
@@ -62,7 +46,10 @@ groupsRouter.get("/unjoinedGroups", (req, res) => {
   const token = getTokenFrom(req);
   const decodedToken = jwt.verify(token, process.env.SECRET);
   if (decodedToken) {
-    Group.find({ players: { $ne: [decodedToken.id] } })
+    Group.find({
+      players: { $ne: [decodedToken.id] },
+      meetingDateTime: { $gt: Math.floor(Date.now() / 1000) },
+    })
       .then((data) => {
         res.send(data);
       })
