@@ -11,21 +11,10 @@ const getTokenFrom = (req) => {
     if (cookie.indexOf("jwt") >= 0) {
       token = cookie;
     } else {
-      token = null;
+      return null;
     }
   });
   return token.substr(4);
 };
 
-const getDecodedToken = (req) => {
-  let token = getTokenFrom(req);
-  if (token) {
-    token = token.substr(4);
-    let decodedToken = jwt.verify(token, process.env.SECRET);
-    return decodedToken;
-  } else {
-    return null;
-  }
-};
-
-module.exports = { getTokenFrom, getDecodedToken };
+module.exports = { getTokenFrom };
