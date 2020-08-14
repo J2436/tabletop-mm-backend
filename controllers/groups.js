@@ -65,8 +65,14 @@ groupsRouter.post("/joinGroup", async (req, res) => {
   }
 });
 
-groupsRouter.get("/leaveGroup", (req, res) => {
-  res.send(req.user);
+groupsRouter.post("/leaveGroup", (req, res) => {
+  Group.findByIdAndUpdate(
+    req.body.groupID,
+    { $pull: { players: req.user.id } },
+    { useFindAndModify: false }
+  ).then((group) => {
+    res.send({ message: "successfully left group" });
+  });
 });
 
 module.exports = groupsRouter;
